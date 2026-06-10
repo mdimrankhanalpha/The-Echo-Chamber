@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Echo Chamber (PRO)</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="scanlines"></div>
+
+<div class="wrapper">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+<h2>NEURAL USERS</h2>
+<div id="users"></div>
+
+<button class="resetBtn" onclick="resetGame()">RESET SIMULATION</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<div class="topbar">
+<div class="title">THE ECHO CHAMBER // PROTOCOL ACTIVE</div>
+<div id="status">SYSTEM STABLE</div>
+</div>
+
+<div id="feed" class="feed"></div>
+
+<div class="controls">
+<button onclick="injectFactCheck()">FACT CHECK</button>
+<button onclick="algorithmBoost()">BOOST</button>
+<button onclick="filterNoise()">FILTER</button>
+</div>
+
+<div id="log" class="log"></div>
+
+</div>
+
+</div>
+
+<script src="js/game.js"></script>
+</body>
+</html>
