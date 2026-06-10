@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Echo Chamber - ULTIMATE</title>
+
+<style>
+body{
+margin:0;
+font-family:monospace;
+background:#000;
+color:#7CFFB2;
+overflow:hidden;
+}
+
+.wrapper{
+display:grid;
+grid-template-columns:300px 1fr;
+height:100vh;
+}
+
+.sidebar{
+border-right:2px solid #2cff88;
+padding:10px;
+overflow:auto;
+}
+
+.main{
+display:flex;
+flex-direction:column;
+}
+
+.top{
+display:flex;
+justify-content:space-between;
+padding:10px;
+border-bottom:2px solid #2cff88;
+}
+
+.title{
+color:#c77dff;
+text-shadow:0 0 10px #c77dff;
+}
+
+.feed{
+flex:1;
+overflow:auto;
+padding:10px;
+}
+
+.post{
+border:1px solid #2cff88;
+padding:8px;
+margin-bottom:8px;
+background:#050505;
+}
+
+.user{
+border:1px solid #2cff88;
+padding:8px;
+margin-bottom:8px;
+cursor:pointer;
+}
+
+.user.active{
+border-color:#38bdf8;
+}
+
+.user.locked{
+border-color:red;
+color:red;
+}
+
+.user.archived{
+border-color:#38bdf8;
+color:#38bdf8;
+}
+
+.controls{
+border-top:2px solid #2cff88;
+padding:10px;
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+button{
+background:#000;
+color:#7CFFB2;
+border:1px solid #2cff88;
+padding:10px;
+cursor:pointer;
+}
+
+button:hover{background:#0f1f14;}
+
+.log{
+height:120px;
+overflow:auto;
+border-top:2px solid #2cff88;
+padding:5px;
+font-size:12px;
+background:#020202;
+}
+
+.glitch{
+animation:gl 0.2s infinite;
+}
+
+@keyframes gl{
+0%{transform:translate(1px,0);}
+50%{transform:translate(-1px,0);}
+100%{transform:translate(1px,0);}
+}
+
+.flash{
+animation:flash .3s;
+}
+
+@keyframes flash{
+0%{background:red;}
+100%{background:black;}
+}
+
+.scan{
+position:fixed;
+inset:0;
+pointer-events:none;
+background:repeating-linear-gradient(
+to bottom,
+rgba(255,255,255,0.03),
+transparent 3px
+);
+}
+
+@media(max-width:800px){
+.wrapper{grid-template-columns:1fr;}
+.sidebar{height:200px;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="scan"></div>
+
+<div class="wrapper">
+
+<div class="sidebar">
+<h3>USERS</h3>
+<div id="users"></div>
+<button onclick="resetGame()">RESET</button>
+</div>
+
+<div class="main">
+
+<div class="top">
+<div class="title">THE ECHO CHAMBER // ULTIMATE SIM</div>
+<div id="status">STABLE</div>
+</div>
+
+<div id="feed" class="feed"></div>
+
+<div class="controls">
+<button onclick="fact()">FACT CHECK</button>
+<button onclick="boost()">BOOST</button>
+<button onclick="filter()">FILTER</button>
+</div>
+
+<div id="log" class="log"></div>
+
+</div>
+</div>
+
+<script>
+let users=[];
+let selected=0;
+let stability=100;
+
+/* INIT */
+function init(){
+
+let save=localStorage.getItem("echo");
+
+if(save){
+users=JSON.parse(save);
+}else{
+users=[
+{name:"User_88",bias:80,state:"active"},
+{name:"Nostalgia_Bot",bias:70,state:"active"},
+{name:"Quantum_Parrot",bias:90,state:"active"},
+{name:"GhostNode",bias:60,state:"active"},
+{name:"THE_BOSS",bias:50,state:"boss"}
+];
+}
+
+render();
+log("SYSTEM ONLINE");
+}
+
+/* SAVE */
+function save(){
+localStorage.setItem("echo",JSON.stringify(users));
+}
+
+/* POSTS GENERATOR (AI STYLE) */
+function genPost(name){
+const pool=[
+"reality is unstable",
+"memory leaks detected",
+"timeline collapsing",
+"signal corrupted",
+"truth is recursive",
+"echoes are watching",
+"system dreaming"
+];
+return name+": "+pool[Math.floor(Math.random()*pool.length)];
+}
+
+/* RENDER */
+function render(){
+const u=document.getElementById("users");
+const f=document.getElementById("feed");
+u.innerHTML="";
+f.innerHTML="";
+
+users.forEach((x,i)=>{
+
+u.innerHTML+=`
+<div class="user ${x.state} ${i==selected?'active':''}" onclick="selected=${i};render()">
+<b>${x.name}</b><br>
+${x.bias}%</div>`;
+
+f.innerHTML+=`
+<div class="post">
+${genPost(x.name)}
+</div>`;
+});
+
+save();
+}
+
+/* LOG */
+function log(t){
+let l=document.getElementById("log");
+let d=document.createElement("div");
+d.textContent="[SYS] "+t;
+l.prepend(d);
+}
+
+/* SOUND */
+function beep(f){
+try{
+let a=new (window.AudioContext||window.webkitAudioContext)();
+let o=a.createOscillator();
+let g=a.createGain();
+o.frequency.value=f;
+g.gain.value=0.05;
+o.connect(g);g.connect(a.destination);
+o.start();o.stop(a.currentTime+0.1);
+}catch(e){}
+}
+
+/* ACTIONS */
+function fact(){
+let u=users[selected];
+if(u.state!="active")return;
+
+let d=r(10,20);
+u.bias-=d;
+stability+=2;
+log(u.name+" clarity +"+d);
+beep(600);
+
+check(u);
+render();
+}
+
+function boost(){
+let u=users[selected];
+if(u.state!="active")return;
+
+let d=r(10,25);
+u.bias+=d;
+stability-=5;
+log(u.name+" amplified +"+d);
+beep(200);
+
+check(u);
+render();
+}
+
+function filter(){
+let u=users[selected];
+if(u.state!="active")return;
+
+let d=r(5,15);
+u.bias-=d;
+log(u.name+" filtered -"+d);
+beep(400);
+
+check(u);
+render();
+}
+
+/* STATE */
+function check(u){
+if(u.bias<=0){
+u.bias=0;
+u.state="archived";
+log(u.name+" ARCHIVED");
+}
+
+if(u.bias>=100){
+u.bias=100;
+u.state="locked";
+log(u.name+" CORRUPTED");
+glitch();
+}
+}
+
+/* GLITCH */
+function glitch(){
+document.body.classList.add("glitch");
+document.body.classList.add("flash");
+
+setTimeout(()=>{
+document.body.classList.remove("glitch");
+document.body.classList.remove("flash");
+},400);
+}
+
+/* LOOP */
+setInterval(()=>{
+
+users.forEach(u=>{
+if(u.state=="active"){
+u.bias+=r(-3,4);
+u.bias=Math.max(0,Math.min(100,u.bias));
+}
+if(u.state=="boss"){
+u.bias+=r(-2,6);
+}
+});
+
+checkWin();
+render();
+
+},2500);
+
+/* WIN LOSE */
+function checkWin(){
+
+let a=users.every(u=>u.state=="archived");
+let l=users.every(u=>u.state=="locked");
+
+if(a){
+log("VICTORY: ALL MINDS ARCHIVED");
+document.getElementById("status").innerText="CLEARED";
+}
+
+if(l){
+log("FAILURE: SYSTEM LOST");
+document.getElementById("status").innerText="CORRUPTED";
+glitch();
+}
+}
+
+/* RESET */
+function resetGame(){
+localStorage.clear();
+location.reload();
+}
+
+/* UTIL */
+function r(min,max){
+return Math.floor(Math.random()*(max-min+1))+min;
+}
+
+init();
+</script>
+
+</body>
+</html>
